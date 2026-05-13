@@ -16,9 +16,10 @@ export default function Home() {
 
   const loadData = async () => {
     const [donationsSnap, expensesSnap, photosSnap] = await Promise.all([
-      getDocs(collection(db, 'donations')),
-      getDocs(collection(db, 'expenses')),
-      getDocs(query(collection(db, 'progress_photos'), orderBy('uploadedAt', 'desc'), limit(6))),
+      getDocs(collection(db, 'donations')).catch(() => ({ docs: [], size: 0 })),
+      getDocs(collection(db, 'expenses')).catch(() => ({ docs: [] })),
+      getDocs(query(collection(db, 'progress_photos'), orderBy('uploadedAt', 'desc'), limit(6)))
+        .catch(() => getDocs(collection(db, 'progress_photos')).catch(() => ({ docs: [] }))),
     ]);
 
     const totalDonations = donationsSnap.docs.reduce((sum, d) => sum + d.data().amount, 0);

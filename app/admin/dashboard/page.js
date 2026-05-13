@@ -8,7 +8,7 @@ import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, getAuth } 
 import { initializeApp, getApps } from 'firebase/app';
 import {
   collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc,
-  query, orderBy, serverTimestamp,
+  query, orderBy,
 } from 'firebase/firestore';
 
 // Secondary Firebase app to create new auth users without affecting current session
@@ -221,7 +221,7 @@ function AddDonationTab({ onUpdate }) {
       receiptNo,
       paymentMode: formData.paymentMode,
       notes: formData.notes,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
     };
 
     await addDoc(collection(db, 'donations'), donation);
@@ -345,7 +345,7 @@ function AddExpenseTab({ onUpdate, session }) {
       description: formData.description,
       addedBy: session.name,
       reimbursed: false,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
     });
     setFormData({ category: 'Travel', amount: '', paidBy: 'Nageswara Reddy', otherName: '', description: '' });
     setSuccess(true);
@@ -448,8 +448,19 @@ function ProgressPhotosTab({ session }) {
   }, []);
 
   const loadPhotos = async () => {
-    const snap = await getDocs(query(collection(db, 'progress_photos'), orderBy('uploadedAt', 'desc')));
-    setPhotos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    try {
+      const snap = await getDocs(query(collection(db, 'progress_photos'), orderBy('uploadedAt', 'desc')));
+      setPhotos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('loadPhotos error:', err);
+      // Fallback: fetch without ordering if index isn't ready
+      try {
+        const snap = await getDocs(collection(db, 'progress_photos'));
+        setPhotos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      } catch (err2) {
+        console.error('loadPhotos fallback error:', err2);
+      }
+    }
   };
 
   const handleFileChange = (e) => {
@@ -470,7 +481,7 @@ function ProgressPhotosTab({ session }) {
         url,
         description,
         uploadedBy: session.name,
-        uploadedAt: serverTimestamp(),
+        uploadedAt: new Date(),
       });
       setDescription('');
       setSelectedFile(null);
