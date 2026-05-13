@@ -9,6 +9,7 @@ export default function Home() {
   const [stats, setStats] = useState({ totalDonations: 0, totalExpenses: 0, balance: 0, donorCount: 0 });
   const [progressPhotos, setProgressPhotos] = useState([]);
   const [breakdown, setBreakdown] = useState({});
+  const [lightbox, setLightbox] = useState(null); // { url, description }
 
   useEffect(() => {
     loadData();
@@ -117,7 +118,11 @@ export default function Home() {
           {progressPhotos.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-6">
               {progressPhotos.map((photo) => (
-                <div key={photo.id} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition">
+                <div
+                  key={photo.id}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition cursor-pointer"
+                  onClick={() => setLightbox(photo)}
+                >
                   <img src={photo.url} alt={photo.description} className="w-full h-64 object-cover" />
                   <div className="p-4">
                     <p className="font-semibold text-gray-800">{photo.description || ''}</p>
@@ -134,6 +139,31 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Lightbox */}
+        {lightbox && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+            onClick={() => setLightbox(null)}
+          >
+            <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setLightbox(null)}
+                className="absolute -top-10 right-0 text-white text-3xl font-bold hover:text-gray-300"
+              >
+                ✕
+              </button>
+              <img
+                src={lightbox.url}
+                alt={lightbox.description}
+                className="w-full max-h-[80vh] object-contain rounded-lg"
+              />
+              {lightbox.description && (
+                <p className="text-white text-center mt-4 text-lg">{lightbox.description}</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* How to Donate */}
         <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-xl shadow-lg p-12 text-white text-center">
