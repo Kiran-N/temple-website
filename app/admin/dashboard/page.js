@@ -28,7 +28,9 @@ async function uploadToCloudinary(file) {
   );
   const data = await res.json();
   if (!data.secure_url) throw new Error('Cloudinary upload failed');
-  return data.secure_url;
+  // f_auto converts HEIC/HEIF and any format to what the browser supports (WebP/JPEG)
+  // q_auto picks the best quality/size balance
+  return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
 }
 
 export default function AdminDashboard() {
@@ -520,7 +522,7 @@ function ProgressPhotosTab({ session }) {
         )}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">Select Photo *</label>
-          <input type="file" accept="image/*" onChange={handleFileChange}
+          <input type="file" accept="image/*,.heic,.heif" onChange={handleFileChange}
             className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-orange-500" required />
         </div>
         {preview && (
