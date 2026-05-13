@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { auth, db } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -11,35 +14,33 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Default admin credentials (in real version, this comes from Firebase)
-  const defaultAdmins = {
-    'kiran': { password: 'kiran123', name: 'Kiran', role: 'super_admin' },
-    'nageswara': { password: 'reddy123', name: 'Nageswara Reddy', role: 'admin' }
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Check stored admins
-    const storedAdmins = JSON.parse(localStorage.getItem('templeAdmins') || JSON.stringify(defaultAdmins));
-    
-    const admin = storedAdmins[username.toLowerCase()];
-    
-    if (admin && admin.password === password) {
-      // Store session
-      localStorage.setItem('templeAdminSession', JSON.stringify({
+    try {
+      // Look up the real email from Firestore using the username
+      const adminDoc = await getDoc(doc(db, 'admins', username.toLowerCase()));
+      if (!adminDoc.exists()) {
+        setError('Invalid username or password');
+        setLoading(false);
+        return;
+      }
+
+      const adminData = adminDoc.data();
+      await signInWithEmailAndPassword(auth, adminData.email, password);
+
+      sessionStorage.setItem('templeAdminSession', JSON.stringify({
         username: username.toLowerCase(),
-        name: admin.name,
-        role: admin.role,
-        loginTime: new Date().toISOString()
+        name: adminData.name,
+        role: adminData.role,
       }));
-      
-      // Redirect to dashboard
+
       router.push('/admin/dashboard');
-    } else {
-      setError('Invalid username or password');
+    } catch (err) {
+      const authErrors = ['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'];
+      setError(authErrors.includes(err.code) ? 'Invalid username or password' : 'Login failed. Please try again.');
       setLoading(false);
     }
   };
@@ -47,26 +48,18 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo/Header */}
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🕉️</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Temple Admin Panel
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Temple Admin Panel</h1>
           <p className="text-gray-600">Lakshmi Chennakeshava Swami Temple</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Admin Login
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Admin Login</h2>
 
           <form onSubmit={handleLogin}>
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">
-                Username
-              </label>
+              <label className="block text-gray-700 font-semibold mb-2">Username</label>
               <input
                 type="text"
                 value={username}
@@ -78,9 +71,7 @@ export default function AdminLogin() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-gray-700 font-semibold mb-2">
-                Password
-              </label>
+              <label className="block text-gray-700 font-semibold mb-2">Password</label>
               <input
                 type="password"
                 value={password}
@@ -107,30 +98,9 @@ export default function AdminLogin() {
           </form>
 
           <div className="mt-6 text-center">
-            <Link 
-              href="/"
-              className="text-orange-600 hover:text-orange-700 font-semibold"
-            >
+            <Link href="/" className="text-orange-600 hover:text-orange-700 font-semibold">
               ← Back to Public Website
             </Link>
-          </div>
-
-          {/* Default Credentials Info */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-semibold mb-2">
-              Default Admin Accounts:
-            </p>
-            <p className="text-xs text-blue-700 mb-1">
-              Username: <code className="bg-blue-100 px-2 py-1 rounded">kiran</code> | 
-              Password: <code className="bg-blue-100 px-2 py-1 rounded ml-1">kiran123</code>
-            </p>
-            <p className="text-xs text-blue-700">
-              Username: <code className="bg-blue-100 px-2 py-1 rounded">nageswara</code> | 
-              Password: <code className="bg-blue-100 px-2 py-1 rounded ml-1">reddy123</code>
-            </p>
-            <p className="text-xs text-blue-600 mt-2">
-              ⚠️ Change these passwords after first login!
-            </p>
           </div>
         </div>
       </div>
