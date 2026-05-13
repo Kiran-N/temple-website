@@ -28,9 +28,10 @@ async function uploadToCloudinary(file) {
   );
   const data = await res.json();
   if (!data.secure_url) throw new Error('Cloudinary upload failed');
-  // f_auto converts HEIC/HEIF and any format to what the browser supports (WebP/JPEG)
-  // q_auto picks the best quality/size balance
-  return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
+  // f_auto: converts HEIC/iPhone photos to WebP/JPEG the browser can display
+  // q_auto: Cloudinary picks best quality/file-size balance
+  // c_limit,w_1920: scale down large photos to max 1920px wide (never upscale)
+  return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,c_limit,w_1920/');
 }
 
 export default function AdminDashboard() {
