@@ -114,24 +114,6 @@ export default function AdminLogin() {
               ← Back to Public Website
             </Link>
           </div>
-
-          {/* Default Credentials Info */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-semibold mb-2">
-              Default Admin Accounts:
-            </p>
-            <p className="text-xs text-blue-700 mb-1">
-              Username: <code className="bg-blue-100 px-2 py-1 rounded">kiran</code> | 
-              Password: <code className="bg-blue-100 px-2 py-1 rounded ml-1">kiran123</code>
-            </p>
-            <p className="text-xs text-blue-700">
-              Username: <code className="bg-blue-100 px-2 py-1 rounded">nageswara</code> | 
-              Password: <code className="bg-blue-100 px-2 py-1 rounded ml-1">reddy123</code>
-            </p>
-            <p className="text-xs text-blue-600 mt-2">
-              ⚠️ Change these passwords after first login!
-            </p>
-          </div>
         </div>
       </div>
     </div>
