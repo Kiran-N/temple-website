@@ -49,8 +49,8 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <div className="text-4xl">🕉️</div>
               <div>
-                <h1 className="text-3xl font-bold">Lakshmi Chennakeshava Swami Temple</h1>
-                <p className="text-orange-100">Yaramalapalli</p>
+                <h1 className="text-3xl font-bold">Lakshmi Chennakeshava Swamy Temple</h1>
+                <p className="text-orange-100">Yaramalapalli Village, Kadapa, Andhra Pradesh</p>
               </div>
             </div>
             <Link 
@@ -67,7 +67,7 @@ export default function Home() {
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-800 mb-4">
-            Building a Divine Home for Lord Chennakeshava
+            Building a Divine Home for Lord Lakshmi Chennakeshava Swamy
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Join us in constructing a sacred space for our community. 
@@ -165,7 +165,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
-          <p className="mb-2">🕉️ Lakshmi Chennakeshava Swami Temple, Yaramalapalli</p>
+          <p className="mb-2">🕉️ Lakshmi Chennakeshava Swami Temple, Yaramalapalli Village, Kadapa, Andhra Pradesh</p>
           <p className="text-gray-400 text-sm">Built with devotion and transparency</p>
         </div>
       </footer>
